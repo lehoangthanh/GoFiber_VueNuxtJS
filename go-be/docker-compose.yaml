@@ -1,0 +1,50 @@
+version: '3'
+networks:
+  bridge:
+    driver: bridge
+services:
+  backend:
+    build:
+      dockerfile: Dockerfile
+      context: .
+    ports:
+      - "8000:8000"
+    volumes:
+      - .:/app
+    links:
+      - mysql_go
+    depends_on:
+      - mysql_go
+      - redis_go
+    networks:
+      - bridge
+    extra_hosts:
+      - "host.docker.internal:host-gateway"
+
+####MYSQL-DB##########
+  mysql_go:
+    build:
+      context: ./mysql
+      args:
+        - MYSQL_VERSION=5.7
+    environment:
+      - MYSQL_DATABASE=go_tutorial
+      - MYSQL_USER=default
+      - MYSQL_PASSWORD=default
+      - MYSQL_ROOT_PASSWORD=root
+      - TZ=UTC
+    volumes:
+      - ~/mysql:/var/lib/mysql
+      - ./mysql/docker-entrypoint-initdb.d:/docker-entrypoint-initdb.d
+    ports:
+      - "33006:3306"
+    networks:
+      - bridge
+
+####REDIS-CACHE##########
+  redis_go:
+    image: redis:latest
+    networks:
+      - bridge
+    ports:
+      - "63709:6379"
