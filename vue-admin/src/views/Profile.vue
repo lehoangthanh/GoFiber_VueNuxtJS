@@ -22,8 +22,7 @@
 </template>
 
 <script>
-import { User } from "@/models/user"
-import axios from "axios";
+
 export default {
 	name: "Profile",
 	data () {
