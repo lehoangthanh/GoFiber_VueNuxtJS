@@ -25,11 +25,11 @@ export default {
 		const store = useStore()
 		const user = computed(() => store.state.user)
 
-		title.value = user.value.id > 0 ? '$' + user.value.revenue : 'Welcome'
+		title.value = user.value > 0 ? '$' + user.value.revenue : 'Welcome'
 		description.value = user.value ? 'You have earned this far' : 'Share links to earn money'
 		
 		watch(user, () => {
-			title.value = user.value.id ? '$' + user.value.revenue : 'Welcome'
+			title.value = user.value ? '$' + user.value.revenue : 'Welcome'
 			description.value = user.value ? 'You have earned this far' : 'Share links to earn money'
 		})
 		return {

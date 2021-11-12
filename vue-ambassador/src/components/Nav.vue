@@ -6,7 +6,7 @@
 				<li><router-link to="/backend" class="nav-link px-2 link-secondary" active-class="link-dark">Backend</router-link></li>
 			</ul>
 			
-			<div class="col-md-9 text-end" v-if="user.id">
+			<div class="col-md-9 text-end" v-if="user">
 				<router-link to="/rankings" class="btn me-2" href="#">Rankings</router-link>
 				<router-link to="/stats" class="btn me-2" href="#">Stats</router-link>
 				<router-link to="/profile" class="btn btn-outline-primary me-2" href="#">
@@ -15,7 +15,7 @@
 				<button type="button" class="btn btn-primary" @click="logout">Logout</button>
 			</div>
 			
-			<div class="col-md-3 text-end" v-if="!user.id">
+			<div class="col-md-3 text-end" v-if="!user">
 				<router-link to="/login" class="btn btn-outline-primary me-2">Login</router-link>
 				<router-link to="/register" class="btn btn-primary">Sign-up</router-link>
 			</div>

@@ -113,7 +113,54 @@ func ProductsFrontend(c *fiber.Ctx) error {
 		json.Unmarshal([]byte(result), &products)
 	}
 	
-	return c.JSON(products)
+	var searchProducts []models.Product
+	if s := c.Query("s"); s != "" {
+		sLower := strings.ToLower(s)
+		for _, product := range products {
+			_title := strings.ToLower(product.Title)
+			_des := strings.ToLower(product.Description)
+			if strings.Contains(_title, sLower) || strings.Contains(_des, sLower) {
+				searchProducts = append(searchProducts, product)
+			}
+		}
+	} else {
+		searchProducts = products
+	}
+	
+	if sortParam := c.Query("sort"); sortParam != "" {
+		sortLower := strings.ToLower(sortParam)
+		if sortLower == "asc" {
+			sort.Slice(searchProducts, func(i, j int) bool {
+				return searchProducts[i].Price < searchProducts[j].Price
+			})
+		} else if sortLower == "desc" {
+			sort.Slice(searchProducts, func(i, j int) bool {
+				return searchProducts[i].Price > searchProducts[j].Price
+			})
+		}
+	}
+	
+	var total = len(searchProducts)
+	iPage, _ := strconv.Atoi(c.Query("page", "1"))
+	var data []models.Product
+	perPage := 10
+	
+	if total <= iPage*perPage && total >= (iPage - 1) * perPage {
+		data = searchProducts[(iPage - 1)*perPage : total]
+	} else if total >= iPage*perPage {
+		data = searchProducts[(iPage - 1)*perPage : iPage * perPage]
+	} else {
+		data = []models.Product{}
+	}
+	
+	return c.JSON(fiber.Map{
+		"data":      data,
+		"total":     total,
+		"page":      iPage,
+		"last_page": (total / perPage) + 1,
+	})
+	
+	return c.JSON(searchProducts)
 }
 
 func ProductsBackend(c *fiber.Ctx) error {
@@ -138,7 +185,9 @@ func ProductsBackend(c *fiber.Ctx) error {
 	if s := c.Query("s"); s != "" {
 		sLower := strings.ToLower(s)
 		for _, product := range products {
-			if strings.Contains(product.Title, sLower) || strings.Contains(product.Description, sLower) {
+			_title := strings.ToLower(product.Title)
+			_des := strings.ToLower(product.Description)
+			if strings.Contains(_title, sLower) || strings.Contains(_des, sLower) {
 				searchProducts = append(searchProducts, product)
 			}
 		}
